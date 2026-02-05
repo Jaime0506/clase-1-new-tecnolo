@@ -54,9 +54,8 @@ jobs:
       - name: Build Windows executable
         run: flutter build windows --release
 
-      - name: List build output
-        run: ls build/windows/runner/Release
-        shell: bash
+      - name: Show build directory structure
+        run: dir build /s
 
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
