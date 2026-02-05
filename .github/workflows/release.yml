@@ -44,12 +44,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: app-release-apk
-
-      - name: Download Windows artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: windows-release-exe
-      
+          
       - name: Create Release and Upload Assets
         uses: softprops/action-gh-release@v1
         with:
