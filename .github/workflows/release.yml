@@ -5,12 +5,12 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write
 
 jobs:
   build:
-    permissions:
-      contents: write
-      runs-on: windows-latest
+    runs-on: windows-latest
 
     steps:
       - name: Checkout
@@ -19,7 +19,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-        channel: 'stable'
+          channel: stable
 
       - name: Install dependencies
         run: flutter pub get
@@ -38,5 +38,3 @@ jobs:
           files: |
             build/app/outputs/flutter-apk/app-release.apk
             build/windows/x64/runner/Release/myapp.exe
-        env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
