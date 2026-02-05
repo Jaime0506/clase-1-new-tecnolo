@@ -54,11 +54,15 @@ jobs:
       - name: Build Windows executable
         run: flutter build windows --release
 
+      - name: List build output
+        run: ls build/windows/runner/Release
+        shell: bash
+
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
         with:
           name: windows-release-exe
-          path: build/windows/runner/Release/
+          path: build/windows/runner/Release/*
 
   create_release:
     name: Create GitHub Release
