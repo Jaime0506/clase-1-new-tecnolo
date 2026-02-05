@@ -1,14 +1,16 @@
-name: Flutter Build Demo
+name: Flutter Build & Release
 
 on:
   push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    tags:
+      - "v*"
 
 jobs:
   build:
     runs-on: windows-latest
+
+    permissions:
+      contents: write   # NECESARIO para crear releases
 
     steps:
       - name: Checkout code
@@ -27,23 +29,27 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      # 📱 ANDROID APK (DEBUG, SIN FIRMA)
+      # 📱 ANDROID APK (DEBUG)
       - name: Build Android APK (debug)
         run: flutter build apk --debug
 
-      # 🪟 WINDOWS BUILD
+      # 🪟 WINDOWS BUILD (RELEASE)
       - name: Build Windows app
         run: flutter build windows
 
-      # 📦 ARTEFACTOS
-      - name: Upload Android APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-debug-apk
-          path: build/app/outputs/flutter-apk/app-debug.apk
+      # 📦 ZIP WINDOWS BUILD
+      - name: Zip Windows build
+        run: |
+          powershell Compress-Archive `
+            -Path build/windows/runner/Release/* `
+            -DestinationPath windows-release.zip
 
-      - name: Upload Windows App
-        uses: actions/upload-artifact@v4
+      # 🚀 CREATE GITHUB RELEASE
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          name: windows-build
-          path: build/windows/runner/Release/
+          files: |
+            build/app/outputs/flutter-apk/app-debug.apk
+            windows-release.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
