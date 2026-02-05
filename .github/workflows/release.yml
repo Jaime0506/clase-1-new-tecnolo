@@ -33,36 +33,6 @@ jobs:
           name: app-release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
 
-  build_windows:
-    name: Build Windows Executable
-    runs-on: windows-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-
-      - name: Enable Windows desktop support
-        run: flutter config --enable-windows-desktop
-
-      - name: Create Windows desktop project
-        run: flutter create . --platforms=windows
-
-      - name: Build Windows executable
-        run: flutter build windows --release
-
-      - name: Show build directory structure
-        run: dir build /s
-
-      - name: Upload Windows artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-release-exe
-          path: build/windows/runner/Release/*
-
   create_release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
