@@ -1,55 +1,42 @@
-name: Flutter Build & Release
+name: Build and Release
 
 on:
   push:
     tags:
-      - "v*"
+      - 'v*'
+
+  permissions:
+    contents: write
 
 jobs:
   build:
     runs-on: windows-latest
 
-    permissions:
-      contents: write   # NECESARIO para crear releases
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v2
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+      channel: 'stable'
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: "3.35.2"
-          channel: "stable"
-          cache: true
+    - name: Install dependencies
+      run: flutter pub get
 
-      - name: Flutter doctor
-        run: flutter doctor
+    - name: Build APK
+      run: flutter build apk --release
 
-      - name: Install dependencies
-        run: flutter pub get
+    - name: Build Windows
+      run: |
+        flutter config --enable-windows-desktop
+        flutter build windows --release
 
-      # 📱 ANDROID APK (DEBUG)
-      - name: Build Android APK (debug)
-        run: flutter build apk --debug
-
-      # 🪟 WINDOWS BUILD (RELEASE)
-      - name: Build Windows app
-        run: flutter build windows
-
-      # 📦 ZIP WINDOWS BUILD
-      - name: Zip Windows build
-        run: |
-          powershell Compress-Archive `
-            -Path build/windows/runner/Release/* `
-            -DestinationPath windows-release.zip
-
-      # 🚀 CREATE GITHUB RELEASE
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            build/app/outputs/flutter-apk/app-debug.apk
-            windows-release.zip
-        env:
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          build/app/outputs/flutter-apk/app-release.apk
+          build/windows/x64/runner/Release/myapp.exe
+      env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
